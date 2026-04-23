@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Construtora Horizonte</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Cormorant Garamond', 'serif'],
+            sans:    ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            stone: {
+              50:  '#faf9f7', 100: '#f2f0eb', 200: '#e5e0d5',
+              300: '#d2c9b8', 400: '#b8a98e', 500: '#9d8a6a',
+              600: '#7e6b50', 700: '#63533e', 800: '#4a3e2f',
+              900: '#362d22', 950: '#1e1912',
+            },
+            copper: { 400: '#c4773a', 500: '#ab6430', 600: '#8f5127' },
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    *, body { font-family: 'Outfit', sans-serif; }
+    .font-display, h1, h2, h3 { font-family: 'Cormorant Garamond', serif; }
+
+    html { scroll-behavior: smooth; }
+
+    .hero-overlay {
+      background: linear-gradient(160deg, #1e1912 0%, #362d22 45%, #4a3e2f 100%);
+    }
+
+    /* Noise texture overlay */
+    .noise::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .card-hover { transition: transform 0.35s ease, box-shadow 0.35s ease; }
+    .card-hover:hover { transform: translateY(-5px); box-shadow: 0 24px 48px rgba(30,25,18,.12); }
+
+    /* Chat */
+    #chat-panel {
+      transform: translateY(20px);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      pointer-events: none;
+    }
+    #chat-panel.open {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .msg-in  { animation: fadeUp .2s ease forwards; }
+    .msg-out { animation: fadeUp .2s ease forwards; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(6px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .dot { animation: pulse 1.4s infinite; }
+    .dot:nth-child(2) { animation-delay:.2s; }
+    .dot:nth-child(3) { animation-delay:.4s; }
+    @keyframes pulse { 0%,80%,100%{transform:scale(0.7);opacity:.4} 40%{transform:scale(1);opacity:1} }
+
+    /* Scroll fade */
+    .appear { opacity:0; transform:translateY(28px); transition: opacity .65s ease, transform .65s ease; }
+    .appear.on { opacity:1; transform:translateY(0); }
+
+    /* Status pills */
+    .pill-green  { background:#d1fae5; color:#065f46; }
+    .pill-blue   { background:#dbeafe; color:#1e40af; }
+    .pill-amber  { background:#fef3c7; color:#92400e; }
+  </style>
+</head>
+
+<body class="bg-stone-50 text-stone-900 antialiased">
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50 bg-stone-950/95 backdrop-blur-md border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 h-16 flex items-center justify-between">
+    <a href="#" class="flex items-center gap-3">
+      <div class="w-8 h-8 border border-copper-400 rounded flex items-center justify-center">
+        <span class="font-display font-bold text-copper-400 text-base leading-none">H</span>
+      </div>
+      <span class="font-display font-semibold text-white text-xl tracking-wide">Horizonte</span>
+    </a>
+    <div class="hidden md:flex items-center gap-8 text-sm text-stone-400">
+      <a href="#empreendimentos" class="hover:text-white transition-colors">Empreendimentos</a>
+      <a href="#sobre" class="hover:text-white transition-colors">Sobre</a>
+      <a href="#contato" class="hover:text-white transition-colors">Contato</a>
+      <a href="tel:1140028922" class="bg-copper-500 hover:bg-copper-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-xs tracking-wide">
+        (11) 4002-8922
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero-overlay noise relative min-h-screen flex items-center pt-16 overflow-hidden">
+  <!-- Grid lines decorativas -->
+  <div class="absolute inset-0 opacity-5" style="background-image: linear-gradient(rgba(196,119,58,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(196,119,58,.6) 1px, transparent 1px); background-size: 80px 80px;"></div>
+
+  <div class="relative max-w-7xl mx-auto px-5 lg:px-8 py-24 grid lg:grid-cols-5 gap-12 items-center">
+    <!-- Text -->
+    <div class="lg:col-span-3">
+      <div class="inline-flex items-center gap-2 text-copper-400 text-xs font-medium tracking-[0.2em] uppercase mb-6 border border-copper-400/30 px-3 py-1.5 rounded-full">
+        <span class="w-1.5 h-1.5 bg-copper-400 rounded-full"></span>
+        Desde 2009 · São Paulo & Interior
+      </div>
+      <h1 class="font-display font-bold text-white leading-[1.0] mb-6" style="font-size:clamp(3rem,7vw,6rem);">
+        Cada detalhe<br/>pensado<br/><em class="text-copper-400 not-italic">para você.</em>
+      </h1>
+      <p class="text-stone-400 text-lg leading-relaxed mb-10 max-w-lg">
+        Imóveis residenciais com qualidade certificada, entrega pontual e atendimento que não termina na assinatura.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="#empreendimentos" class="bg-copper-500 hover:bg-copper-600 text-white font-medium px-6 py-3 rounded-xl transition-colors text-sm shadow-lg shadow-copper-500/25">
+          Ver empreendimentos
+        </a>
+        <button onclick="abrirChat()" class="flex items-center gap-2 border border-white/20 hover:border-white/40 text-white text-sm font-medium px-6 py-3 rounded-xl transition-colors">
+          <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+          Falar com assistente IA
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats card -->
+    <div class="lg:col-span-2 grid grid-cols-2 gap-3">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5 col-span-2">
+        <div class="text-4xl font-display font-bold text-white mb-1">5.200+</div>
+        <div class="text-stone-500 text-sm">famílias que chamam de lar</div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+        <div class="text-3xl font-display font-bold text-copper-400 mb-1">48</div>
+        <div class="text-stone-500 text-xs">obras entregues</div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+        <div class="text-3xl font-display font-bold text-white mb-1">0</div>
+        <div class="text-stone-500 text-xs">atrasos em 15 anos</div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
+        <div class="text-3xl font-display font-bold text-white mb-1">15</div>
+        <div class="text-stone-500 text-xs">anos de mercado</div>
+      </div>
+      <div class="bg-copper-500/20 border border-copper-500/30 rounded-2xl p-5">
+        <div class="text-3xl font-display font-bold text-copper-400 mb-1">★ 5</div>
+        <div class="text-stone-400 text-xs">satisfação clientes</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EMPREENDIMENTOS -->
+<section id="empreendimentos" class="py-24 bg-stone-50">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8">
+    <div class="mb-14 appear">
+      <span class="text-copper-500 text-xs font-semibold tracking-[0.2em] uppercase">Portfólio</span>
+      <h2 class="font-display font-bold text-stone-900 mt-2 mb-3" style="font-size:clamp(2rem,4vw,3rem);">Nossos Empreendimentos</h2>
+      <p class="text-stone-500 text-lg max-w-xl">Do studio ao alto padrão — encontre o imóvel que combina com o seu momento.</p>
+    </div>
+
+    <!-- Filtros -->
+    <div id="filtros" class="flex flex-wrap gap-2 mb-10 appear">
+      <button class="filtro ativo" data-f="todos" onclick="filtrar(this,'todos')">Todos</button>
+      <button class="filtro" data-f="Lançamento" onclick="filtrar(this,'Lançamento')">🚀 Lançamento</button>
+      <button class="filtro" data-f="Em Obras" onclick="filtrar(this,'Em Obras')">🏗 Em Obras</button>
+      <button class="filtro" data-f="Pronto para Morar" onclick="filtrar(this,'Pronto para Morar')">✅ Pronto para Morar</button>
+    </div>
+
+    <style>
+      .filtro { padding:.5rem 1rem; border-radius:9999px; font-size:.8rem; font-weight:500; border:1px solid #d2c9b8; color:#63533e; cursor:pointer; transition:all .2s; background:white; }
+      .filtro:hover { border-color:#c4773a; color:#c4773a; }
+      .filtro.ativo { background:#362d22; color:white; border-color:#362d22; }
+    </style>
+
+    <div id="grid" class="grid md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section id="sobre" class="py-24 bg-stone-900">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 grid lg:grid-cols-2 gap-16 items-center">
+    <div class="appear">
+      <span class="text-copper-400 text-xs font-semibold tracking-[0.2em] uppercase">Nossa história</span>
+      <h2 class="font-display font-bold text-white mt-2 mb-5" style="font-size:clamp(2rem,4vw,2.8rem);">Construímos com quem<br/>vai morar.</h2>
+      <p class="text-stone-400 leading-relaxed mb-4">
+        A Construtora Horizonte nasceu em 2009 com uma premissa simples: construir imóveis que resistem ao tempo — na estrutura e no coração de quem mora. Em 15 anos, nos tornamos referência em qualidade e transparência no interior e Grande São Paulo.
+      </p>
+      <p class="text-stone-400 leading-relaxed mb-8">
+        Cada empreendimento passa por um processo rigoroso de projeto, execução e pós-entrega. Nosso compromisso não termina na entrega das chaves.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <span class="flex items-center gap-1.5 text-stone-300 text-sm bg-white/5 px-3 py-1.5 rounded-full border border-white/10">✓ ISO 9001</span>
+        <span class="flex items-center gap-1.5 text-stone-300 text-sm bg-white/5 px-3 py-1.5 rounded-full border border-white/10">✓ Membro CBIC</span>
+        <span class="flex items-center gap-1.5 text-stone-300 text-sm bg-white/5 px-3 py-1.5 rounded-full border border-white/10">✓ Selo Verde</span>
+        <span class="flex items-center gap-1.5 text-stone-300 text-sm bg-white/5 px-3 py-1.5 rounded-full border border-white/10">✓ CRECI-SP 12345-J</span>
+      </div>
+    </div>
+    <div class="appear grid grid-cols-2 gap-3">
+      <div class="bg-copper-500/20 border border-copper-500/30 rounded-2xl p-7">
+        <div class="text-5xl font-display font-bold text-copper-400 mb-2">98%</div>
+        <div class="text-stone-400 text-sm">Clientes satisfeitos com a entrega</div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-7">
+        <div class="text-5xl font-display font-bold text-white mb-2">3×</div>
+        <div class="text-stone-400 text-sm">Prêmio Qualidade SECOVI-SP</div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-7 col-span-2">
+        <blockquote class="text-stone-300 text-lg font-display leading-relaxed italic">
+          "Comprar da Horizonte foi a melhor decisão da nossa vida. Entregaram exatamente o que prometeram."
+        </blockquote>
+        <cite class="text-stone-500 text-xs mt-3 block not-italic">— Ana Paula S., cliente Vista Verde</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<section id="contato" class="py-24 bg-stone-100 border-t border-stone-200">
+  <div class="max-w-4xl mx-auto px-5 lg:px-8 text-center appear">
+    <span class="text-copper-500 text-xs font-semibold tracking-[0.2em] uppercase">Contato</span>
+    <h2 class="font-display font-bold text-stone-900 mt-2 mb-4" style="font-size:clamp(2rem,4vw,3rem);">Vamos conversar?</h2>
+    <p class="text-stone-500 text-lg mb-12 max-w-lg mx-auto">Nossa equipe está pronta para encontrar o imóvel ideal para você.</p>
+    <div class="grid sm:grid-cols-3 gap-4 mb-10">
+      <a href="tel:1140028922" class="bg-white hover:bg-stone-50 border border-stone-200 rounded-2xl p-6 text-center transition-colors group block">
+        <div class="w-11 h-11 bg-stone-900 rounded-xl flex items-center justify-center mx-auto mb-3">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 7V5z"/></svg>
+        </div>
+        <div class="font-semibold text-stone-900 text-sm mb-0.5">Ligar agora</div>
+        <div class="text-stone-500 text-xs">(11) 4002-8922</div>
+      </a>
+      <a href="https://wa.me/5511999991234" target="_blank" class="bg-white hover:bg-stone-50 border border-stone-200 rounded-2xl p-6 text-center transition-colors group block">
+        <div class="w-11 h-11 bg-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </div>
+        <div class="font-semibold text-stone-900 text-sm mb-0.5">WhatsApp</div>
+        <div class="text-stone-500 text-xs">(11) 99999-1234</div>
+      </a>
+      <button onclick="abrirChat()" class="bg-white hover:bg-stone-50 border border-stone-200 rounded-2xl p-6 text-center transition-colors cursor-pointer block w-full">
+        <div class="w-11 h-11 bg-copper-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1 1 .03 2.798-1.414 2.798H4.612c-1.444 0-2.414-1.798-1.414-2.798L4.8 15.3"/></svg>
+        </div>
+        <div class="font-semibold text-stone-900 text-sm mb-0.5">Assistente IA</div>
+        <div class="text-stone-500 text-xs">Resposta instantânea</div>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bg-stone-950 py-8 border-t border-white/5">
+  <div class="max-w-7xl mx-auto px-5 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-7 h-7 border border-copper-400 rounded flex items-center justify-center">
+        <span class="font-display text-copper-400 font-bold text-sm">H</span>
+      </div>
+      <span class="text-stone-500 text-sm">© 2024 Construtora Horizonte</span>
+    </div>
+    <span class="text-stone-700 text-xs">CRECI-SP 12345-J · CNPJ 00.000.000/0001-00</span>
+  </div>
+</footer>
+
+<!-- CHAT BTN -->
+<button id="fab" onclick="toggleChat()" title="Falar com assistente"
+  class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-stone-900 hover:bg-stone-800 text-white rounded-2xl shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 border border-white/10">
+  <svg id="ic-chat" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+  <svg id="ic-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
+  <span id="fab-dot" class="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-stone-950"></span>
+</button>
+
+<!-- CHAT PANEL -->
+<div id="chat-panel" class="fixed bottom-24 right-6 z-50 w-[22rem] max-w-[calc(100vw-1.5rem)] bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden flex flex-col" style="height:540px;">
+
+  <!-- Header -->
+  <div class="bg-stone-950 px-5 py-4 flex items-center gap-3 flex-shrink-0">
+    <div class="relative">
+      <div class="w-9 h-9 bg-copper-500 rounded-xl flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+      </div>
+      <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-stone-950"></span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="text-white text-sm font-semibold">Horizonte IA</div>
+      <div class="text-stone-500 text-xs">Powered by Google Gemini</div>
+    </div>
+    <button onclick="toggleChat()" class="text-stone-600 hover:text-stone-300 transition-colors p-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+    </button>
+  </div>
+
+
+
+  <!-- Messages -->
+  <div id="msgs" class="flex-1 overflow-y-auto p-4 space-y-3 bg-stone-50" style="min-height:0;scrollbar-width:thin;">
+    <div class="msg-in flex gap-2">
+      <div class="w-7 h-7 bg-copper-500 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 text-white text-xs font-bold">H</div>
+      <div class="bg-white border border-stone-100 rounded-2xl rounded-tl-sm px-3.5 py-2.5 max-w-[82%] shadow-sm">
+        <p class="text-stone-800 text-sm leading-relaxed">Olá! Sou o assistente da <strong>Construtora Horizonte</strong>. 🏠</p>
+        <p class="text-stone-600 text-xs mt-1 leading-relaxed">Posso te ajudar com empreendimentos, preços, financiamento e visitas. Como posso ajudar?</p>
+      </div>
+    </div>
+    <div id="chips" class="flex flex-wrap gap-1.5 pl-9">
+      <button onclick="q('Quais empreendimentos vocês têm disponíveis?')" class="chip">🏢 Ver empreendimentos</button>
+      <button onclick="q('Como funciona o financiamento?')" class="chip">💰 Financiamento</button>
+      <button onclick="q('Aceita FGTS?')" class="chip">🏦 FGTS</button>
+      <button onclick="q('Quero agendar uma visita')" class="chip">📅 Agendar visita</button>
+    </div>
+  </div>
+
+  <style>
+    .chip { background:white; border:1px solid #d2c9b8; color:#63533e; font-size:.7rem; font-weight:500; padding:.3rem .75rem; border-radius:9999px; cursor:pointer; transition:all .15s; }
+    .chip:hover { border-color:#c4773a; color:#c4773a; }
+  </style>
+
+  <!-- Input -->
+  <div class="p-3 border-t border-stone-100 bg-white flex-shrink-0">
+    <div class="flex gap-2 items-end">
+      <textarea id="inp-msg" rows="1" placeholder="Escreva sua mensagem..."
+        class="flex-1 resize-none border border-stone-200 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-stone-400 focus:ring-2 focus:ring-stone-100 transition-all bg-stone-50"
+        style="max-height:72px;"
+        onkeydown="kEnter(event)" oninput="autoH(this)"></textarea>
+      <button onclick="send()" class="w-9 h-9 bg-stone-900 hover:bg-stone-700 text-white rounded-xl flex items-center justify-center flex-shrink-0 transition-colors">
+        <svg class="w-4 h-4 rotate-45" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE -->
+<div id="modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+  <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+
+// ============================================================
+// ▶ 1. COLE SUA API KEY AQUI
+// ============================================================
+const API_KEY = "***REMOVIDO***";
+
+// ============================================================
+// ▶ 2. COLE O SYSTEM INSTRUCTION DO AI STUDIO AQUI
+//    (tudo que você escreveu no campo "System instructions")
+// ============================================================
+const SYSTEM_INSTRUCTION = `
+  Cole aqui o texto do System Instruction que você criou no Google AI Studio.
+  Exemplo:
+  Você é o assistente da Construtora Horizonte...
+`;
+
+// ============================================================
+// ▶ 3. CONFIGURAÇÕES DO MODELO (copie do AI Studio)
+// ============================================================
+const TEMPERATURA   = 0.7;   // mesma que você definiu no AI Studio
+const MAX_TOKENS    = 500;   // tamanho máximo da resposta
+
+
+// ============================================================
+// A PARTIR DAQUI NÃO PRECISA MEXER
+// ============================================================
+
+let historico = []; // guarda o histórico da conversa
+let DB = null;      // guarda os dados do empreendimentos.json
+
+
+// --- Carrega o JSON de empreendimentos ---
+async function carregarDados() {
+  const resposta = await fetch('./data/empreendimentos.json');
+  DB = await resposta.json();
+  montarCards(DB.empreendimentos);
+}
+
+
+// --- Envia mensagem para o Gemini e retorna a resposta ---
+async function perguntarGemini(mensagem) {
+  historico.push({ role: "user", parts: [{ text: mensagem }] });
+
+  const corpo = {
+    system_instruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+    contents: historico,
+    generationConfig: {
+      temperature: TEMPERATURA,
+      maxOutputTokens: MAX_TOKENS
+    }
+  };
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+  const res  = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(corpo) });
+  const json = await res.json();
+
+  const resposta = json.candidates[0].content.parts[0].text;
+  historico.push({ role: "model", parts: [{ text: resposta }] });
+
+  return resposta;
+}
+
+
+// --- Abre e fecha o chat ---
+function toggleChat() {
+  document.getElementById('chat-panel').classList.toggle('open');
+  document.getElementById('ic-chat').classList.toggle('hidden');
+  document.getElementById('ic-close').classList.toggle('hidden');
+  document.getElementById('fab-dot')?.remove();
+}
+function abrirChat() {
+  if (!document.getElementById('chat-panel').classList.contains('open')) toggleChat();
+}
+
+
+// --- Envia mensagem ao clicar ou apertar Enter ---
+async function send() {
+  const input = document.getElementById('inp-msg');
+  const texto = input.value.trim();
+  if (!texto) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('chips')?.remove();
+
+  adicionarMensagemUsuario(texto);
+
+  const idLoading = adicionarLoading();
+  const resposta  = await perguntarGemini(texto);
+  removerLoading(idLoading);
+
+  adicionarMensagemBot(resposta);
+}
+
+function enviarRapido(texto) {
+  document.getElementById('inp-msg').value = texto;
+  send();
+  document.getElementById('chips')?.remove();
+}
+
+function askAbout(nome) {
+  closeModal();
+  abrirChat();
+  setTimeout(() => { document.getElementById('inp-msg').value = `Quero saber mais sobre o ${nome}`; send(); }, 350);
+}
+
+function kEnter(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+function autoH(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 72) + 'px';
+}
+
+
+// --- Funções de UI do chat ---
+function adicionarMensagemUsuario(texto) {
+  inserirNoChat(`
+    <div class="msg-out flex justify-end">
+      <div class="bg-stone-900 text-white rounded-2xl rounded-tr-sm px-3.5 py-2.5 max-w-[82%] shadow-sm">
+        <p class="text-sm leading-relaxed">${texto}</p>
+      </div>
+    </div>`);
+}
+
+function adicionarMensagemBot(texto) {
+  const formatado = texto
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br/>');
+  inserirNoChat(`
+    <div class="msg-in flex gap-2">
+      <div class="w-7 h-7 bg-copper-500 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 text-white text-xs font-bold">H</div>
+      <div class="bg-white border border-stone-100 rounded-2xl rounded-tl-sm px-3.5 py-2.5 max-w-[82%] shadow-sm">
+        <p class="text-stone-800 text-sm leading-relaxed">${formatado}</p>
+      </div>
+    </div>`);
+}
+
+function adicionarLoading() {
+  const id = 'load-' + Date.now();
+  inserirNoChat(`
+    <div id="${id}" class="msg-in flex gap-2">
+      <div class="w-7 h-7 bg-copper-500 rounded-xl flex items-center justify-center flex-shrink-0 text-white text-xs font-bold">H</div>
+      <div class="bg-white border border-stone-100 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
+        <div class="flex gap-1">
+          <span class="dot w-2 h-2 bg-stone-400 rounded-full block"></span>
+          <span class="dot w-2 h-2 bg-stone-400 rounded-full block"></span>
+          <span class="dot w-2 h-2 bg-stone-400 rounded-full block"></span>
+        </div>
+      </div>
+    </div>`);
+  return id;
+}
+
+function removerLoading(id) {
+  document.getElementById(id)?.remove();
+}
+
+function inserirNoChat(html) {
+  const container = document.getElementById('msgs');
+  container.insertAdjacentHTML('beforeend', html);
+  container.scrollTop = container.scrollHeight;
+}
+
+
+// --- Cards de empreendimentos ---
+const GRADIENTS = [
+  'from-stone-800 to-stone-700',
+  'from-stone-900 to-copper-500/70',
+  'from-stone-700 to-stone-900',
+  'from-copper-600/80 to-stone-900',
+  'from-stone-800 to-stone-600',
+];
+
+function montarCards(lista) {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  lista.forEach((emp, i) => {
+    const pill = emp.status === 'Pronto para Morar' ? 'pill-green' : emp.status === 'Em Obras' ? 'pill-blue' : 'pill-amber';
+    const precoMin = emp.preco_min.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+    const pct = Math.round(emp.unidades_disponiveis / emp.unidades_total * 100);
+
+    grid.innerHTML += `
+    <article class="card-hover bg-white rounded-2xl overflow-hidden border border-stone-100 shadow-sm">
+      <div class="h-44 bg-gradient-to-br ${GRADIENTS[i % GRADIENTS.length]} relative flex items-end p-5">
+        <div class="relative">
+          <span class="inline-block ${pill} text-xs font-semibold px-2.5 py-1 rounded-full mb-2">${emp.status}</span>
+          <h3 class="font-display font-bold text-white text-xl leading-tight">${emp.nome}</h3>
+          <p class="text-white/60 text-xs mt-0.5">${emp.bairro}, ${emp.cidade}</p>
+        </div>
+      </div>
+      <div class="p-5">
+        <p class="text-stone-500 text-sm leading-relaxed mb-4 line-clamp-2">${emp.descricao}</p>
+        <div class="grid grid-cols-3 gap-2 mb-4 text-center">
+          <div class="bg-stone-50 rounded-xl py-2"><div class="font-semibold text-stone-900 text-xs">${emp.area_m2}</div><div class="text-stone-400 text-[10px] mt-0.5">Área</div></div>
+          <div class="bg-stone-50 rounded-xl py-2"><div class="font-semibold text-stone-900 text-xs">${emp.quartos}</div><div class="text-stone-400 text-[10px] mt-0.5">Dorms.</div></div>
+          <div class="bg-stone-50 rounded-xl py-2"><div class="font-semibold text-stone-900 text-xs">${emp.vagas}</div><div class="text-stone-400 text-[10px] mt-0.5">Vagas</div></div>
+        </div>
+        <div class="mb-4">
+          <div class="flex justify-between text-[11px] text-stone-400 mb-1">
+            <span>${emp.unidades_disponiveis} disponíveis de ${emp.unidades_total}</span><span>${pct}%</span>
+          </div>
+          <div class="h-1 bg-stone-100 rounded-full"><div class="h-1 bg-copper-500 rounded-full" style="width:${pct}%"></div></div>
+        </div>
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-[10px] text-stone-400">A partir de</div>
+            <div class="font-display font-bold text-stone-900 text-lg">${precoMin}</div>
+          </div>
+          <button onclick="openModal(${emp.id})" class="bg-stone-900 hover:bg-stone-700 text-white text-xs font-medium px-4 py-2 rounded-xl transition-colors">Ver mais</button>
+        </div>
+      </div>
+    </article>`;
+  });
+  ativarAnimacoes();
+}
+
+function filtrar(btn, f) {
+  document.querySelectorAll('.filtro').forEach(b => b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  const lista = f === 'todos' ? DB.empreendimentos : DB.empreendimentos.filter(e => e.status === f);
+  montarCards(lista);
+}
+
+
+// --- Modal de detalhes ---
+function openModal(id) {
+  const emp = DB.empreendimentos.find(x => x.id === id);
+  const pill = emp.status === 'Pronto para Morar' ? 'pill-green' : emp.status === 'Em Obras' ? 'pill-blue' : 'pill-amber';
+  const precoMin = emp.preco_min.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+  const precoMax = emp.preco_max.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="h-52 bg-gradient-to-br from-stone-900 to-stone-700 flex items-end p-6 relative">
+      <button onclick="closeModal()" class="absolute top-4 right-4 w-8 h-8 bg-white/15 hover:bg-white/25 rounded-full text-white flex items-center justify-center transition-colors">✕</button>
+      <div>
+        <span class="${pill} text-xs font-semibold px-2.5 py-1 rounded-full mb-2 inline-block">${emp.status} · ${emp.tipo}</span>
+        <h3 class="font-display font-bold text-white text-3xl">${emp.nome}</h3>
+        <p class="text-white/60 text-sm mt-1">${emp.bairro}, ${emp.cidade}</p>
+      </div>
+    </div>
+    <div class="p-6">
+      <p class="text-stone-600 leading-relaxed mb-6">${emp.descricao}</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 text-center">
+        <div class="bg-stone-50 rounded-xl p-3"><div class="font-semibold text-stone-900 text-sm">${emp.area_m2}</div><div class="text-stone-400 text-xs">Área</div></div>
+        <div class="bg-stone-50 rounded-xl p-3"><div class="font-semibold text-stone-900 text-sm">${emp.quartos}</div><div class="text-stone-400 text-xs">Dormitórios</div></div>
+        <div class="bg-stone-50 rounded-xl p-3"><div class="font-semibold text-stone-900 text-sm">${emp.suites}</div><div class="text-stone-400 text-xs">Suítes</div></div>
+        <div class="bg-stone-50 rounded-xl p-3"><div class="font-semibold text-stone-900 text-sm">${emp.vagas}</div><div class="text-stone-400 text-xs">Garagem</div></div>
+      </div>
+      <div class="mb-6">
+        <h4 class="font-semibold text-stone-900 text-sm mb-3">Lazer & Diferenciais</h4>
+        <div class="grid sm:grid-cols-2 gap-2">
+          ${emp.lazer.map(d => `<div class="flex gap-2 text-sm text-stone-700"><span class="text-copper-500">✓</span>${d}</div>`).join('')}
+        </div>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between pt-4 border-t border-stone-100">
+        <div>
+          <div class="text-xs text-stone-400">Faixa de preço</div>
+          <div class="font-display font-bold text-stone-900 text-xl">${precoMin} – ${precoMax}</div>
+          <div class="text-xs text-stone-400 mt-0.5">Entrega: ${emp.entrega}</div>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+          <button onclick="askAbout('${emp.nome}')" class="flex-1 sm:flex-none border border-stone-200 text-stone-700 hover:bg-stone-50 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors">💬 Perguntar IA</button>
+          <a href="tel:1140028922" class="flex-1 sm:flex-none bg-stone-900 hover:bg-stone-700 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors text-center">Ligar</a>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modal').classList.replace('hidden', 'flex');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.replace('flex', 'hidden');
+  document.body.style.overflow = '';
+}
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
+
+
+// --- Animações de scroll ---
+function ativarAnimacoes() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('on');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.appear').forEach(el => observer.observe(el));
+}
+
+
+// --- Inicializa o site ---
+document.addEventListener('DOMContentLoaded', () => {
+  carregarDados();
+  ativarAnimacoes();
+});
+
+</script>
+</body>
+</html>
